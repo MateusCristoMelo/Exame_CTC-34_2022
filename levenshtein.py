@@ -1,5 +1,3 @@
-import json
-
 class LevenshteinAutomaton:
     def __init__(self, string, n):
         self.string = string
@@ -26,13 +24,15 @@ class LevenshteinAutomaton:
     def transitions(self, state):
         return set(c for (i,c) in enumerate(self.string) if state[i] <= self.max_edits) 
 
-
 counter = [0] # list is a hack for mutable lexical scoping
 states = {}
 transitions = []
 matching = []
+words = []
 
-lev = LevenshteinAutomaton("wooo", 3)
+#string = input("Enter a word: ")
+string = "banana"
+lev = LevenshteinAutomaton(string, 1)
 
 def explore(state):
     key = tuple(state) # lists can't be hashed in Python so convert to a tuple
@@ -40,15 +40,58 @@ def explore(state):
     i = counter[0]
     counter[0] += 1
     states[key] = i
-    if lev.is_match(state): matching.append(i)
+    if lev.is_match(state): 
+        matching.append(i)
     for c in lev.transitions(state) | set(['*']):
         newstate = lev.step(state, c)
         j = explore(newstate)
         transitions.append((i, j, c))
     return i
 
+def findAllWordsUtil(source, destination, visited, word):
+
+    visited[source] = True
+
+    if source == destination:
+        words.append(word)
+
+    else:
+        for i in transitions:
+            if(i[0] == source):
+                if visited[i[1]] == False:
+                    word = word + i[2]
+                    findAllWordsUtil(i[1], destination, visited, word)
+                    word = word[: len(word) - 1]
+    #path.pop()
+    visited[source] = False
+
+def findAllWords(source = 0):
+    visited = [False] * (len(transitions))
+    word = ""
+    for s in matching:
+        findAllWordsUtil(source, s, visited, word)
+
 explore(lev.start())
 
+#print(transitions)
+#print(states)
+findAllWords()
+print(words)
+#[]
+#lev(abacax)
+#(abacaxi) -> [abacaxi]
+#lev(abacax*)
+#...
+#(abacaxeiro) -> [abacaxi, abacaxeiro]
+
+# criacao de lista vazia
+
+# digitar palavra
+# montar grafo de todos que tem distancia 1
+# percorrer o grafo e escrever todas as palavras achadas que tem distancia 1
+# fazer interseção com o dicionario pra ver se tem alguma palavra que vai
+# se tiver, colocar esse elemento numa lista
+# printar a lista no final
 
 #word = input()
 #data = json.load(open('data.json'))
