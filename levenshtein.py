@@ -29,9 +29,12 @@ states = {}
 transitions = []
 matching = []
 words = []
+dic = open("american-english", 'r')
+dicWords = dic.read().splitlines() 
+interWords = []
 
+string = "snake"
 #string = input("Enter a word: ")
-string = "banana"
 lev = LevenshteinAutomaton(string, 1)
 
 def explore(state):
@@ -62,7 +65,6 @@ def findAllWordsUtil(source, destination, visited, word):
                     word = word + i[2]
                     findAllWordsUtil(i[1], destination, visited, word)
                     word = word[: len(word) - 1]
-    #path.pop()
     visited[source] = False
 
 def findAllWords(source = 0):
@@ -73,10 +75,32 @@ def findAllWords(source = 0):
 
 explore(lev.start())
 
-#print(transitions)
-#print(states)
+def leveinsthein_comparation(word1, word2):
+    if(len(word1) != len(word2)):
+        return False
+    for i in range(len(word1)):
+        if word1[i] == word2[i] or word2[i] == "*":
+            continue
+        else:
+            return False
+    return True
+
+def comp():
+    for i in dicWords:
+        for j in words:
+                if leveinsthein_comparation(i, j) == True:
+                    print(i)
+
+
+#print(leveinstein_comparation("snake", "snak*"))
 findAllWords()
-print(words)
+comp()
+
+
+#a = dicWords[87433]
+
+
+
 #[]
 #lev(abacax)
 #(abacaxi) -> [abacaxi]
@@ -86,9 +110,9 @@ print(words)
 
 # criacao de lista vazia
 
-# digitar palavra
-# montar grafo de todos que tem distancia 1
-# percorrer o grafo e escrever todas as palavras achadas que tem distancia 1
+# V digitar palavra
+# V montar grafo de todos que tem distancia 1
+# V percorrer o grafo e escrever todas as palavras achadas que tem distancia 1
 # fazer interseção com o dicionario pra ver se tem alguma palavra que vai
 # se tiver, colocar esse elemento numa lista
 # printar a lista no final
