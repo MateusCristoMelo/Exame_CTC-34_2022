@@ -33,8 +33,8 @@ dic = open("american-english", 'r')
 dicWords = dic.read().splitlines() 
 interWords = []
 
-string = "snake"
-#string = input("Enter a word: ")
+#string = "snake"
+string = input("Enter a word: ")
 lev = LevenshteinAutomaton(string, 1)
 
 def explore(state):
@@ -51,11 +51,18 @@ def explore(state):
         transitions.append((i, j, c))
     return i
 
+
+def check_asterisk(word):
+    for c in word:
+        if c == "*":
+            return True
+    return False
+
 def findAllWordsUtil(source, destination, visited, word):
 
     visited[source] = True
 
-    if source == destination:
+    if source == destination and check_asterisk(word) == True:
         words.append(word)
 
     else:
@@ -75,6 +82,8 @@ def findAllWords(source = 0):
 
 explore(lev.start())
 
+
+
 def leveinsthein_comparation(word1, word2):
     if(len(word1) != len(word2)):
         return False
@@ -88,36 +97,9 @@ def leveinsthein_comparation(word1, word2):
 def comp():
     for i in dicWords:
         for j in words:
-                if leveinsthein_comparation(i, j) == True:
-                    print(i)
+                if interWords.count(i) == 0 and leveinsthein_comparation(i, j) == True:
+                    interWords.append(i)
 
-
-#print(leveinstein_comparation("snake", "snak*"))
 findAllWords()
 comp()
-
-
-#a = dicWords[87433]
-
-
-
-#[]
-#lev(abacax)
-#(abacaxi) -> [abacaxi]
-#lev(abacax*)
-#...
-#(abacaxeiro) -> [abacaxi, abacaxeiro]
-
-# criacao de lista vazia
-
-# V digitar palavra
-# V montar grafo de todos que tem distancia 1
-# V percorrer o grafo e escrever todas as palavras achadas que tem distancia 1
-# fazer interseção com o dicionario pra ver se tem alguma palavra que vai
-# se tiver, colocar esse elemento numa lista
-# printar a lista no final
-
-#word = input()
-#data = json.load(open('data.json'))
-
-#automaton = LevenshteinAutomaton(word, 1)
+print(interWords)
