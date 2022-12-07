@@ -24,8 +24,8 @@ typedef struct transition
 
 typedef struct fst
 {
-    STATE begin;
-    STATE end;
+    STATE *begin;
+    STATE *end;
     int length;
     STATE **states_list;
 } FST;
@@ -85,7 +85,7 @@ void clear_state(STATE *x) {
 
         if(x->transitions_list[i] != NULL)
         {
-            erase_transition(transitions_list[i]);
+            erase_transition(x->transitions_list[i]);
             --(x->transitions);
         };
 
@@ -98,7 +98,7 @@ void clear_state(STATE *x) {
 
         if(x->reverse_transitions_list[i] != NULL)
         {
-            erase_transition(reverse_transitions_list[i]);
+            erase_transition(x->reverse_transitions_list[i]);
             --(x->reverse_transitions);
         };
 
@@ -192,8 +192,7 @@ void set_transition(STATE *from, STATE *next, char letter, int weight) {
 
 void erase_transition(TRANST *a) {
     
-    free(a->letter);
-    free(a->weight);
+    free(a);
 
 };
 
@@ -294,7 +293,7 @@ void clear_transducer(FST *t) {
 
         if(t->states_list[i] != NULL)
         {
-            clear_state(states_list[i]);
+            clear_state(t->states_list[i]);
             --(t->length);
         };
 
@@ -317,19 +316,13 @@ LIST *create_list(int max_words, int max_word_size) {
 
     //************************************** NEED TO PASS THE MAXIMUM LENGHT **************************************************
     
-    l->input_list = (char **) malloc(max_words * (max_word_size + 1) * sizeof(char));
+    l->words_list = (char **) malloc(max_words * (max_word_size + 1) * sizeof(char));
 
     return l;
 
 };
 
-std::string read_list(LIST *list, int index) {
-
-    return list->words_list[index];
-
-};
-
-void add_list(LIST *list, std::string word) {
+void add_list(LIST *list, char *word) {
 
     int size = list->length;
     
@@ -358,13 +351,6 @@ void clear_list(LIST *list) {
 
 };
 
-// dictionary *****************************************************************************************************************
-
-std::string read_dictionary(int index) {
-
-};
-
-
 // create FST using the file dictionary ***************************************************************************************
 
 FST *create_fst(void) {
@@ -378,7 +364,7 @@ FST *create_fst(void) {
     while(/*dictionary not print eof*/)
     {
 
-        std::string current_word = read_dictionary(dictionary_length);
+        std::string current_word = /* read_dictionary(dictionary_length)*/;
 
         if(current_word.length() > max_word_size)
         {
@@ -407,7 +393,7 @@ FST *create_fst(void) {
         ++input_length;
 
         // get the current word of the english dictionary *********************************************************************
-        std::string current_word = read_dictionary(input_length);
+        std::string current_word = /*read_dictionary(input_length)*/ NULL;
 
         int prefix_length = 0;
 
@@ -418,7 +404,7 @@ FST *create_fst(void) {
         for(int index = 0; index < input_length ; ++index)
         {
 
-            std::string aux = read_list(input, index);
+            std::string aux = input->words_list[index];
 
             int i = 0;
 
@@ -473,7 +459,7 @@ FST *create_fst(void) {
 
         int ind_suffix = current_word.length();
 
-        while(j > prefix_length)
+        while(ind_suffix > prefix_length)
         {
             
             STATE *prev_aux = previous_state(prev, current_word[ind_suffix]);

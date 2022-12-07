@@ -1,5 +1,5 @@
-#ifndef FST
-#define FST
+#ifndef FST_
+#define FST_
 
 typedef struct state STATE;
 typedef struct transition TRANST;
@@ -34,13 +34,9 @@ void clear_transducer(FST *t);
 
 LIST *create_list(int max_words, int max_word_size);
 
-std::string read_list(LIST *list, int index);
-
-void add_list(LIST *list, std::string word);
+void add_list(LIST *list, char *word);
 
 void clear_list(LIST *list);
-
-std::string read_dictionary(int index);
 
 FST *create_fst(void);
 
