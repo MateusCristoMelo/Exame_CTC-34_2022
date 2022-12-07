@@ -363,11 +363,10 @@ FST *create_fst(void) {
     int max_word_size = 0;
 
     // read all dictionary
-    while(/*dictionary not print eof*/)
-    {
-
-        std::string current_word = /* read_dictionary(dictionary_length)*/;
-
+    std::ifstream infile("american-english");
+    std::string current_word;
+    while (infile >> current_word) {
+        // Insert each word into the FST
         if(current_word.length() > max_word_size)
         {
 
@@ -376,8 +375,8 @@ FST *create_fst(void) {
         };
 
         ++dictionary_length;
-
-    };
+    }
+    infile.close();
 
     FST *transducer = new_transducer(dictionary_length, max_word_size);
 
@@ -389,13 +388,12 @@ FST *create_fst(void) {
 
     int input_length = 0;
 
-    while(input_length < dictionary_length)
+    std::ifstream infile2("american-english");
+
+    while(infile >> current_word)
     {
 
         ++input_length;
-
-        // get the current word of the english dictionary *********************************************************************
-        std::string current_word = /*read_dictionary(input_length)*/ NULL;
 
         int prefix_length = 0;
 
@@ -513,6 +511,7 @@ FST *create_fst(void) {
 
     };
 
+    infile2.close();
     clear_list(input);
 
     return transducer;

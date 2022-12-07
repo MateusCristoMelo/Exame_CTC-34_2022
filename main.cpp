@@ -9,16 +9,17 @@ int main() {
     // create a fst from the outside file
     FST *current_fst = create_fst();
 
-    /*
-    // prepare the code for read substrings
-    char a = 's';
-
     STATE *s = current_fst->begin;
 
-    // substring read from terminal char by char
-    while(scanf("%c", a))
-    {
-        // get the output from a given state in the transducer
+    // Prompt the user to enter letters
+    std::cout << "Enter some letters: ";
+
+    // Keep prompting the user to enter letters until they enter the '#' character
+    std::string prefix;
+    while (std::cin >> prefix) {
+        if (prefix == "#") {
+            break;
+        }
 
         s = next_state(s, a);
 
@@ -50,15 +51,32 @@ int main() {
 
                 while(x != nullptr || !is_final(current_fst, x))
                 {
-
+                    
                 };
 
             };
         };
 
-    };
+        // Print the matching words
+        std::cout << "Matching words: " << std::endl;
+        for (const std::string& word : words) {
+            std::cout << word << std::endl;
+        }
 
-    */
+        // Prompt the user to enter another set of letters
+        std::cout << "Enter some letters: ";
+    }
+
+    // substring read from terminal char by char
+    while(scanf("%c", a))
+    {
+        // get the output from a given state in the transducer
+
+        
+
+        
+
+    };
 
     // print the FST and save in an outside file
     // some function that receives the current fst and print it
