@@ -1,10 +1,12 @@
 #ifndef FST_
 #define FST_
 
+#include <vector>
+#include <string>
+
 typedef struct state STATE;
 typedef struct transition TRANST;
 typedef struct fst FST;
-typedef struct list LIST;
 
 typedef struct state
 {
@@ -33,12 +35,6 @@ typedef struct fst
     STATE **states_list;
 } FST;
 
-typedef struct list
-{
-    int length;
-    char **words_list;
-} LIST;
-
 STATE *new_state(FST *t, bool bounds);
 
 void clear_state(STATE *x);
@@ -65,12 +61,16 @@ void insert_transducer(FST *t, STATE *x);
 
 void clear_transducer(FST *t);
 
-LIST *create_list(int max_words, int max_word_size);
+std::vector<std::string> *create_list(int max_words, int max_word_size);
 
-void add_list(LIST *list, char *word);
+void add_list(std::vector<std::string> *list, char *word);
 
-void clear_list(LIST *list);
+void clear_list(std::vector<std::string> *list);
 
 FST *create_fst(void);
+
+void print_words_with_prefix(FST *fst, std::string prefix);
+
+std::string get_word(FST *fst, STATE *state);
 
 #endif
