@@ -37,10 +37,6 @@ class SparseLevenshteinAutomaton:
     def transitions(self, indices):
         return set(self.string[i] for i in indices if i < len(self.string))
 
-
-
-# use the automaton to build a DFA
-
 counter = [0] # list is a hack for mutable lexical scoping
 states = {}
 transitions = []
@@ -49,8 +45,8 @@ words = []
 dic = open("american-english", 'r')
 dicWords = dic.read().splitlines() 
 
-#string = "snake"
-string = input("Enter a word: ")
+#string = input("Enter a word: ")
+string = input()
 lev = SparseLevenshteinAutomaton(string, 1)
 
 def explore(state):

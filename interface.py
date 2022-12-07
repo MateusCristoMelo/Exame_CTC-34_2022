@@ -1,4 +1,19 @@
 from tkinter import *
+from subprocess import run
+
+def choice_function():
+    if(radio_button_var.get() == "Levenshtein"):
+        autocomplete_text["text"] = run(["python", "levenshtein.py"], text = True, input = input_string.get(), capture_output= True).stdout
+        #import levenshtein
+        #levenshtein.string = input_string.get()
+        #autocomplete_text["text"] = levenshtein.words
+
+    #elif(radio_button_var.get() == "FST"):
+
+    #elif(radio_button_var.get() == "Hash"):
+        
+    else:
+        autocomplete_text["text"] = "Selecione uma opção"
 
 def levenshteinfunc():
     autocomplete_text["text"] = radio_button_var.get() + ": " + input_string.get() 
@@ -22,11 +37,10 @@ Levenshtein_selection_button.grid(column = 0, row = 3, padx = 10)
 input_string = Entry(window)
 input_string.grid(column = 0, row = 4, padx = 10, pady = 10)
 
-enter_button = Button(window, text = "Enter", command = levenshteinfunc)
+enter_button = Button(window, text = "Enter", command = choice_function)
 enter_button.grid(column = 0, row = 5, padx = 10, pady = 10)
 
 autocomplete_text = Label(window, text = "")
 autocomplete_text.grid(column = 0, row = 6, padx = 10, pady = 10)
-
 
 window.mainloop()
