@@ -69,8 +69,6 @@ void clear_list(std::vector<std::string> *list);
 
 FST *create_fst(void);
 
-void print_words_with_prefix(FST *fst, std::string prefix);
-
-std::string get_word(FST *fst, STATE *state);
+void print_words_with_prefix(const std::string& prefix, FST *fst);
 
 #endif

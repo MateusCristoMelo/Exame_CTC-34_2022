@@ -221,29 +221,11 @@ FST *new_transducer(int dictionary_length, int max_word_size) {
 };
 
 bool is_final(FST *t, STATE *x) {
-    
-    if(x == t->end)
-    {
-        
-        return true;
-    
-    };
-
-    return false;
-
+    return (x == t->end);
 };
 
 bool is_initial(FST *t, STATE *x) {
-    
-    if(x == t->begin)
-    {
-        
-        return true;
-    
-    };
-
-    return false;
-
+    return (x == t->begin);
 };
 
 void insert_transducer(FST *t, STATE *x) {
@@ -288,10 +270,9 @@ std::vector<std::string> *create_list(int size) {
 
 };
 
-void add_list(std::vector<std::string> *list, char *word) {
-
-    list->push_back(word);
-
+void add_list(std::vector<std::string> *list, char *word, int index) {
+    std::string word_string = word;
+    list->at(index) = word_string;
 };
 
 void clear_list(std::vector<std::string> *list) {
@@ -302,7 +283,6 @@ void clear_list(std::vector<std::string> *list) {
 
 FST *create_fst(void) {
 
-    // get the length of words already in the fst
     int dictionary_length = 0;
 
     int max_word_size = 0;
@@ -345,32 +325,19 @@ FST *create_fst(void) {
         // loop through the input list and find the word which has the prefix with the greatest lenght in commom to the current word
         for(int index = 0; index < input_length ; ++index)
         {
-
             std::string aux = input->at(index);
-
             int i = 0;
 
             while(i < current_word.length())
             {
-                
-                if(current_word[i] != aux[i])
-                {
-
+                if((i == aux.length()) || (current_word[i] != aux[i])) {
                     break;
-
-                };
-
+                }
                 ++i;
-
             };
 
             if(prefix_length < i)
-            {
-
                 prefix_length = i;
-
-            };
-
         };
 
         // find a prefix using the FST beggining in the final state
@@ -394,7 +361,7 @@ FST *create_fst(void) {
 
             STATE *nex_aux = next_state(nex, current_word[ind_prefix]);
 
-            if(nex_aux == nullptr || is_final(transducer, nex_aux) || ind_prefix == (prefix_length - 1))
+            if(nex_aux == nullptr || is_final(transducer, nex_aux))
             {
 
                 break;
@@ -417,7 +384,7 @@ FST *create_fst(void) {
             
             STATE *prev_aux = previous_state(prev, current_word[ind_suffix]);
 
-            if(prev_aux == nullptr || is_initial(transducer, prev_aux) || ind_suffix == (ind_prefix + 1))
+            if(prev_aux == nullptr || is_initial(transducer, prev_aux))
             {
 
                 break;
@@ -432,11 +399,11 @@ FST *create_fst(void) {
 
         // construct the rest of the string from the prefix index state to the suffix index state
 
-        int n = ind_prefix + 1;
+        int n = ind_prefix;
 
-        while(n <= ind_suffix)
+        while(n <= (ind_suffix - 1))
         {
-            if(n == ind_prefix + 1)
+            if(n == ind_prefix)
             {
                 curr_weight = input_length + 1 - curr_weight;
             }
@@ -460,7 +427,7 @@ FST *create_fst(void) {
         char *word = new char[current_word.length() + 1];
         strcpy(word, current_word.c_str());
 
-        add_list(input, word);
+        add_list(input, word, input_length);
         ++input_length;
 
     };
@@ -472,68 +439,15 @@ FST *create_fst(void) {
 
 };
 
-void print_words_with_prefix(FST *fst, std::string prefix) {
-    // Initialize the current state as the initial state of the FST
+void print_words_with_prefix(const std::string& prefix, FST *fst) {
+    // Start at the beginning of the FST
     STATE *current_state = fst->begin;
 
-    // Iterate through each character in the given prefix
     for (char c : prefix) {
-        // Find the next state in the FST for the current character
-        STATE *next = next_state(current_state, c);
-
-        // If there is no next state, there are no words in the FST that begin with the given prefix
-        if (next == nullptr) {
+        current_state = next_state(current_state, c);
+        if (current_state == nullptr) {
+            std::cout << "No words found with prefix \"" << prefix << "\"." << std::endl;
             return;
         }
-
-        // Set the current state to the next state
-        current_state = next;
     }
-
-    // Perform a depth-first search starting from the current state
-    std::stack<STATE*> state_stack;
-    state_stack.push(current_state);
-
-    while (!state_stack.empty()) {
-        // Pop the top state from the stack
-        STATE *current_state = state_stack.top();
-        state_stack.pop();
-
-        // If the current state is a final state, print the word it represents
-        if (is_final(fst, current_state)) {
-            std::string word = get_word(fst, current_state);
-            std::cout << word << std::endl;
-        }
-
-        // Push all the next states for each transition from the current state onto the stack
-        for (int i = 0; i < current_state->transitions; i++) {
-            TRANST *transition = current_state->transitions_list[i];
-            state_stack.push(transition->next);
-        }
-    }
-}
-
-std::string get_word(FST *fst, STATE *state) {
-    // Initialize an empty string for the word
-    std::string word;
-
-    // Initialize the current state as the given state
-    STATE *current_state = state;
-
-    // While the current state is not the initial state of the FST
-    while (current_state != fst->begin) {
-        // Iterate through the reverse transitions of the current state
-        for (int i = 0; i < current_state->reverse_transitions; i++) {
-            TRANST *transition = current_state->reverse_transitions_list[i];
-
-            // If the transition has a non-space character as its label, append it to the beginning of the word
-            if (transition->letter != ' ') {
-                word = transition->letter + word;
-                current_state = transition->next;
-                break;
-            }
-        }
-    }
-
-    return word;
 }
