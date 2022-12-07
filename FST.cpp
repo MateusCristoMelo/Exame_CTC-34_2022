@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <fstream>
+#include <iostream>
 
 
 
@@ -221,7 +222,7 @@ FST *new_transducer(int dictionary_length, int max_word_size) {
 
 };
 
-bool is_final_(FST *t, STATE *x) {
+bool is_final(FST *t, STATE *x) {
     
     if(x == t->end)
     {
@@ -337,7 +338,6 @@ FST *create_fst(void) {
     std::ifstream infile("american-english");
     std::string current_word;
     while (infile >> current_word) {
-        // Insert each word into the FST
         if(current_word.length() > max_word_size)
         {
 
@@ -348,6 +348,8 @@ FST *create_fst(void) {
         ++dictionary_length;
     }
     infile.close();
+
+    // create transducer
 
     FST *transducer = new_transducer(dictionary_length, max_word_size);
 
@@ -360,10 +362,8 @@ FST *create_fst(void) {
     int input_length = 0;
 
     std::ifstream infile2("american-english");
-
-    while(infile >> current_word)
+    while(infile2 >> current_word)
     {
-
         ++input_length;
 
         int prefix_length = 0;
@@ -415,7 +415,7 @@ FST *create_fst(void) {
 
             STATE *nex_aux = next_state(nex, current_word[ind_prefix]);
 
-            if(nex_aux == nullptr || is_final_(transducer, nex_aux))
+            if(nex_aux == nullptr || is_final(transducer, nex_aux))
             {
 
                 break;

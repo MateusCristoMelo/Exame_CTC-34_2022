@@ -57,7 +57,7 @@ void set_weight(STATE *x, STATE *next, int new_weight);
 
 FST *new_transducer(int dictionary_length, int max_word_size);
 
-bool is_final_(FST *t, STATE *x);
+bool is_final(FST *t, STATE *x);
 
 bool is_initial(FST *t, STATE *x);
 
