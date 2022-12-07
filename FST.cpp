@@ -1,40 +1,11 @@
 #include "FST.h"
 #include <stdbool.h>
 #include <string>
+#include <string.h>
 #include <stdio.h>
+#include <fstream>
 
-typedef struct state
-{
-    int index;
-    //transition list have an upper bound as a maximum amount of letters using in english language following the ASCII table
-    int transitions;
-    TRANST **transitions_list;
-    //just make another array to store all the transitions this state is receiving, the next in these transitions is actually the previous
-    // the reverse transitions ARENT THE SAME of the transitions, so they are a different object, just a copy, but not the same pointer
-    int reverse_transitions;
-    TRANST **reverse_transitions_list;
-} STATE;
 
-typedef struct transition
-{
-    char letter;
-    int weight;
-    STATE *next;
-} TRANST;
-
-typedef struct fst
-{
-    STATE *begin;
-    STATE *end;
-    int length;
-    STATE **states_list;
-} FST;
-
-typedef struct list
-{
-    int length;
-    char **words_list;
-} LIST;
 
 // transducer states ****************************************************************************************************************
 
@@ -250,7 +221,7 @@ FST *new_transducer(int dictionary_length, int max_word_size) {
 
 };
 
-bool is_final(FST *t, STATE *x) {
+bool is_final_(FST *t, STATE *x) {
     
     if(x == t->end)
     {
@@ -362,7 +333,7 @@ FST *create_fst(void) {
 
     int max_word_size = 0;
 
-    // read all dictionary
+    // read words from 'american-english' file
     std::ifstream infile("american-english");
     std::string current_word;
     while (infile >> current_word) {
@@ -444,7 +415,7 @@ FST *create_fst(void) {
 
             STATE *nex_aux = next_state(nex, current_word[ind_prefix]);
 
-            if(nex_aux == nullptr || is_final(transducer, nex_aux))
+            if(nex_aux == nullptr || is_final_(transducer, nex_aux))
             {
 
                 break;
@@ -507,7 +478,10 @@ FST *create_fst(void) {
 
         set_transition(nex, prev, current_word[n], 0);
 
-        add_list(input, current_word);
+        char *word = new char[current_word.length() + 1];
+        strcpy(word, current_word.c_str());
+
+        add_list(input, word);
 
     };
 

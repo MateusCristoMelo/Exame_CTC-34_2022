@@ -1,87 +1,42 @@
-/***********************************/
-/* CTC-34: FST auto complete of the english language */
-/***********************************/
-
 #include "FST.h"
-#include <stdio.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
 
 int main() {
-    // create a fst from the outside file
-    FST *current_fst = create_fst();
+    // Create the FST from the file "american-english"
+    FST *fst = create_fst();
 
-    STATE *s = current_fst->begin;
+    // Keep watching the input for new letters
+    cout << "Enter a prefix to search for matching words: ";
+    string prefix;
+    cin >> prefix;
 
-    // Prompt the user to enter letters
-    std::cout << "Enter some letters: ";
+    // Initialize the current state as the initial state of the FST
+    STATE *current_state = fst->begin;
 
-    // Keep prompting the user to enter letters until they enter the '#' character
-    std::string prefix;
-    while (std::cin >> prefix) {
-        if (prefix == "#") {
-            break;
+    // Traverse the FST using the letters of the prefix
+    for (char c : prefix) {
+        current_state = next_state(current_state, c);
+        if (current_state == nullptr) {
+            // If the prefix is not found in the FST, there are no matching words
+            cout << "No matching words found for prefix '" << prefix << "'" << endl;
+            return 0;
         }
-
-        s = next_state(s, a);
-
-        if(s == nullptr || is_final(current_fst, s))
-        {
-            
-            printf("there's no words in dictionary anymore.\n");
-
-        }
-        else
-        {
-            // take a limit to the search in the FST
-            int search_limit = 50;
-
-            STATE *x = s;
-
-            for(int i = 0; i < search_limit ; ++i)
-            {
-                
-                for(int j = 0; j < x->transitions ; ++j)
-                {
-                    
-                    x->transitions_list[j]->next;
-                    char c_aux = x->transitions_list[j]->letter;
-
-                };
-                
-                char c_aux = x->transitions;
-
-                while(x != nullptr || !is_final(current_fst, x))
-                {
-                    
-                };
-
-            };
-        };
-
-        // Print the matching words
-        std::cout << "Matching words: " << std::endl;
-        for (const std::string& word : words) {
-            std::cout << word << std::endl;
-        }
-
-        // Prompt the user to enter another set of letters
-        std::cout << "Enter some letters: ";
     }
 
-    // substring read from terminal char by char
-    while(scanf("%c", a))
-    {
-        // get the output from a given state in the transducer
+    // Print the matching words for the prefix
+    cout << "Matching words for prefix '" << prefix << "':" << endl;
+    for (int i = 0; i < current_state->transitions; i++) {
+        // Traverse the transitions of the current state to find the matching words
+        TRANST *transition = current_state->transitions_list[i];
+        // If the transition leads to a final state, it represents a matching word
+        if (is_final_(fst, transition->next)) {
+            cout << transition->letter << endl;
+        }
+    }
 
-        
-
-        
-
-    };
-
-    // print the FST and save in an outside file
-    // some function that receives the current fst and print it
-
-    // destroy fst;
-    clear_transducer(current_fst);
-
+    return 0;
 }
