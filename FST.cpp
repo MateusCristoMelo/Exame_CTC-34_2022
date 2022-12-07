@@ -1,4 +1,4 @@
-#include <FST.h>
+#include "FST.h"
 #include <stdbool.h>
 #include <string>
 #include <stdio.h>
@@ -166,6 +166,8 @@ TRANST *new_transition(STATE *next, char letter, int weight) {
     a->letter = letter;
     a->weight = weight;
     a->next = next;
+
+    return a;
 
 };
 
@@ -434,11 +436,14 @@ FST *create_fst(void) {
         // find a prefix using the FST beggining in the final state
         STATE *nex = transducer->begin;
 
+        int curr_weight = 0;
+
         int ind_prefix = 0;
 
         while(ind_prefix < prefix_length)
         {
-            
+            curr_weight = nex->transitions_list[current_word[ind_prefix]]->weight + curr_weight;
+
             STATE *nex_aux = next_state(nex, current_word[ind_prefix]);
 
             if(nex_aux == nullptr || is_final(transducer, nex_aux))
@@ -479,15 +484,22 @@ FST *create_fst(void) {
 
         // construct the rest of the string from the prefix index state to the suffix index state
 
-        int n = ind_prefix + 1;
-
-        int curr_weight = 0;
+        int n = ind_prefix;
 
         while(n < (ind_suffix - 1))
         {
+            if(n == ind_prefix)
+            {
+                curr_weight = input_length;
+            }
+            else
+            {
+                curr_weight = 0;
+            }
+            
             STATE *aux = new_state(transducer, false);
             
-            set_transition(nex, aux, current_word[n], 0);
+            set_transition(nex, aux, current_word[n], curr_weight);
 
             nex = aux;
 
@@ -495,7 +507,7 @@ FST *create_fst(void) {
 
         };
 
-        set_transition(nex, prev, current_word[n], curr_weight);
+        set_transition(nex, prev, current_word[n], 0);
 
         add_list(input, current_word);
 
