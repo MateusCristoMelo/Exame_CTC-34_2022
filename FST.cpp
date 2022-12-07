@@ -1,40 +1,14 @@
 #include "FST.h"
 #include <stdbool.h>
 #include <string>
+#include <string.h>
 #include <stdio.h>
+#include <fstream>
+#include <iostream>
+#include <vector>
+#include <stack>
 
-typedef struct state
-{
-    int index;
-    //transition list have an upper bound as a maximum amount of letters using in english language following the ASCII table
-    int transitions;
-    TRANST **transitions_list;
-    //just make another array to store all the transitions this state is receiving, the next in these transitions is actually the previous
-    // the reverse transitions ARENT THE SAME of the transitions, so they are a different object, just a copy, but not the same pointer
-    int reverse_transitions;
-    TRANST **reverse_transitions_list;
-} STATE;
 
-typedef struct transition
-{
-    char letter;
-    int weight;
-    STATE *next;
-} TRANST;
-
-typedef struct fst
-{
-    STATE *begin;
-    STATE *end;
-    int length;
-    STATE **states_list;
-} FST;
-
-typedef struct list
-{
-    int length;
-    char **words_list;
-} LIST;
 
 // transducer states ****************************************************************************************************************
 
@@ -111,8 +85,6 @@ void clear_state(STATE *x) {
 // operations *********************************************************************************************************************
 
 STATE *next_state(STATE *x, char letter) {
-    
-    STATE *next = nullptr;
 
     if(x->transitions != 0)
     {
@@ -129,14 +101,12 @@ STATE *next_state(STATE *x, char letter) {
 
     }
     
-    return next;
+    return nullptr;
 
 };
 
 STATE *previous_state(STATE *x, char letter) {
     
-    STATE *previous = nullptr;
-
     if(x->reverse_transitions != 0)
     {
 
@@ -153,7 +123,7 @@ STATE *previous_state(STATE *x, char letter) {
 
     }
     
-    return previous;
+    return nullptr;
 
 };
 
@@ -251,29 +221,11 @@ FST *new_transducer(int dictionary_length, int max_word_size) {
 };
 
 bool is_final(FST *t, STATE *x) {
-    
-    if(x == t->end)
-    {
-        
-        return true;
-    
-    };
-
-    return false;
-
+    return (x == t->end);
 };
 
 bool is_initial(FST *t, STATE *x) {
-    
-    if(x == t->begin)
-    {
-        
-        return true;
-    
-    };
-
-    return false;
-
+    return (x == t->begin);
 };
 
 void insert_transducer(FST *t, STATE *x) {
@@ -310,64 +262,35 @@ void clear_transducer(FST *t) {
 
 // list ***********************************************************************************************************************
 
-LIST *create_list(int max_words, int max_word_size) {
+std::vector<std::string> *create_list(int size) {
     
-    LIST *l = (LIST *) malloc(sizeof(LIST));
-
-    l->length = 0;
-
-    //************************************** NEED TO PASS THE MAXIMUM LENGHT **************************************************
-    
-    l->words_list = (char **) malloc(max_words * (max_word_size + 1) * sizeof(char));
+    std::vector<std::string> *l = new std::vector<std::string>(size);
 
     return l;
 
 };
 
-void add_list(LIST *list, char *word) {
-
-    int size = list->length;
-    
-    list->length = size + 1;
-
-    list->words_list[size] = word;
-
+void add_list(std::vector<std::string> *list, char *word, int index) {
+    std::string word_string = word;
+    list->at(index) = word_string;
 };
 
-void clear_list(LIST *list) {
-
-    int size = list->length;
-    
-    for(int i = 0; i < size ; ++i)
-    {
-
-        if(list->words_list[i] != NULL)
-        {
-            free(list->words_list[i]);
-            --(list->length);
-        };
-
-    };
-
-    free(list);
-
+void clear_list(std::vector<std::string> *list) {
+    list->clear();
 };
 
 // create FST using the file dictionary ***************************************************************************************
 
 FST *create_fst(void) {
 
-    // get the length of words already in the fst
     int dictionary_length = 0;
 
     int max_word_size = 0;
 
-    // read all dictionary
-    while(/*dictionary not print eof*/)
-    {
-
-        std::string current_word = /* read_dictionary(dictionary_length)*/;
-
+    // read words from 'american-english' file
+    std::ifstream infile("american-english");
+    std::string current_word;
+    while (infile >> current_word) {
         if(current_word.length() > max_word_size)
         {
 
@@ -376,27 +299,24 @@ FST *create_fst(void) {
         };
 
         ++dictionary_length;
+    }
+    infile.close();
 
-    };
+    // create transducer
 
     FST *transducer = new_transducer(dictionary_length, max_word_size);
 
     // create input list;
 
-    LIST *input = create_list(dictionary_length, max_word_size);
+    std::vector<std::string> *input = create_list(dictionary_length);
 
     // loop through the dictionary list and adding each input word to input list and fst
 
     int input_length = 0;
 
-    while(input_length < dictionary_length)
+    std::ifstream infile2("american-english");
+    while(infile2 >> current_word)
     {
-
-        ++input_length;
-
-        // get the current word of the english dictionary *********************************************************************
-        std::string current_word = /*read_dictionary(input_length)*/ NULL;
-
         int prefix_length = 0;
 
         // idea to have a FST with better shape is to find in EACH state the word which has the same preffix
@@ -405,32 +325,19 @@ FST *create_fst(void) {
         // loop through the input list and find the word which has the prefix with the greatest lenght in commom to the current word
         for(int index = 0; index < input_length ; ++index)
         {
-
-            std::string aux = input->words_list[index];
-
+            std::string aux = input->at(index);
             int i = 0;
 
             while(i < current_word.length())
             {
-                
-                if(current_word[i] != aux[i])
-                {
-
+                if((i == aux.length()) || (current_word[i] != aux[i])) {
                     break;
-
-                };
-
+                }
                 ++i;
-
             };
 
             if(prefix_length < i)
-            {
-
                 prefix_length = i;
-
-            };
-
         };
 
         // find a prefix using the FST beggining in the final state
@@ -442,7 +349,15 @@ FST *create_fst(void) {
 
         while(ind_prefix < prefix_length)
         {
-            curr_weight = nex->transitions_list[current_word[ind_prefix]]->weight + curr_weight;
+            for(int i = 0; i < nex->transitions ; ++i)
+            {
+                
+                if(nex->transitions_list[i]->letter == current_word[ind_prefix])
+                {
+                    curr_weight = nex->transitions_list[i]->weight + curr_weight;
+                };
+
+            };
 
             STATE *nex_aux = next_state(nex, current_word[ind_prefix]);
 
@@ -462,9 +377,9 @@ FST *create_fst(void) {
         // find a suffix using the FST beggining in the final state
         STATE *prev = transducer->end;
 
-        int ind_suffix = current_word.length();
+        int ind_suffix = current_word.length() - 1;
 
-        while(ind_suffix > prefix_length)
+        while(ind_suffix > ind_prefix)
         {
             
             STATE *prev_aux = previous_state(prev, current_word[ind_suffix]);
@@ -486,11 +401,11 @@ FST *create_fst(void) {
 
         int n = ind_prefix;
 
-        while(n < (ind_suffix - 1))
+        while(n <= (ind_suffix - 1))
         {
             if(n == ind_prefix)
             {
-                curr_weight = input_length;
+                curr_weight = input_length + 1 - curr_weight;
             }
             else
             {
@@ -509,12 +424,30 @@ FST *create_fst(void) {
 
         set_transition(nex, prev, current_word[n], 0);
 
-        add_list(input, current_word);
+        char *word = new char[current_word.length() + 1];
+        strcpy(word, current_word.c_str());
+
+        add_list(input, word, input_length);
+        ++input_length;
 
     };
 
+    infile2.close();
     clear_list(input);
 
     return transducer;
 
 };
+
+void print_words_with_prefix(const std::string& prefix, FST *fst) {
+    // Start at the beginning of the FST
+    STATE *current_state = fst->begin;
+
+    for (char c : prefix) {
+        current_state = next_state(current_state, c);
+        if (current_state == nullptr) {
+            std::cout << "No words found with prefix \"" << prefix << "\"." << std::endl;
+            return;
+        }
+    }
+}
