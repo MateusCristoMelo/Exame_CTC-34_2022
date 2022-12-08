@@ -14,7 +14,7 @@ def search_hash_table(word_dict, word):
 
 def main():
     word_dict = create_hash_table()
-    search = input("Enter a word to search: ")
+    search = input() #"Enter a word to search: ")
     if search_hash_table(word_dict, search):
         print("The word is in the dictionary.")
     else:
