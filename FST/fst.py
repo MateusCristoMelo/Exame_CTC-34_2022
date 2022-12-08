@@ -1,6 +1,5 @@
 import keyboard
 import string
-import sys
 
 def create_minimal_transducer(max_word_length, filename):
     minimal_transducer_states_dict = {}
@@ -36,8 +35,6 @@ def create_minimal_transducer(max_word_length, filename):
 
 def find_minimized(state, minimal_transducer_states_dict, n_states):
     """Returns an equivalent state from the dictionary. If not present, inserts a copy of the parameter to the dictionary and returns it."""
-    # to check if a state is in the minimal_transducer_states_dict, we have to check if their transitions are equivalent and if their output are equivalent
-    # we can't use the == operator because it checks if the objects are the same, not if they are equivalent
     for state_id, state_in_dict in minimal_transducer_states_dict.items():
         if state.transition == state_in_dict.transition and state.final == state_in_dict.final:
             return state_in_dict
@@ -81,9 +78,6 @@ def complete_prefix(n, states, state, word, words):
     return False
 
 def autocomplete(minimal_transducer_states_dict, initial_state):
-    # Wait for the user to type a letter
-    # When they type, prompt the matching words from the input dictionary (do not need enter press)
-    # When they type another, do that again, and so on
 
     state = initial_state
     word = ""
