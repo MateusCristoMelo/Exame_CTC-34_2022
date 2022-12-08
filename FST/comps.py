@@ -1,24 +1,26 @@
 import matplotlib.pyplot as plt
 import time
+from fst import create_minimal_transducer
+from hash_table import create_hash_table
 
 def main():
     filename = 'american-english'
     with open(filename, 'r') as f:
         input_list = f.read().splitlines()
+        max_word_length = max(len(word) for word in input_list)
 
     # compare time to create fst and hash table and count the total number of edges
     # FST **************************************************************************
     start_time = time.time()
-    # FST executable: create_fst()
+    minimal_transducer_states_dict, initial_state = create_minimal_transducer(max_word_length, filename)
     fst_creation_time = (time.time() - start_time)
-    fst_edges = 10
+    fst_edges = len(minimal_transducer_states_dict)
 
     # Hash **************************************************************************
     start_time = time.time()
-    # Hash executable: create_hash_table()
+    hash_dict = create_hash_table()
     hash_creation_time = (time.time() - start_time)
-    hash_edges = 10
-
+    hash_edges = len(hash_dict)
 
     filename = 'test-list'
     with open(filename, 'r') as f:
@@ -59,9 +61,7 @@ def main():
         hash_time_list.append(hash_time)
         print("--- %s seconds ---\n" % hash_time)
 
-
-
-        word_index = word_index + 1
+        word_index += 1
 
     # plot comparable charts
     plt.plot(autocomplete_time_list, fst_time_list)
@@ -78,7 +78,7 @@ def main():
     plt.xlabel('FST')
     plt.ylabel('Hash')
     plt.show()
-    plt.savefig('autocomplete_tests.png')
+    plt.savefig('comps_tests.png')
 
     print("Chart with time comparison (of exact search) between FST and Hash Table ploted.\n\n")
 
@@ -96,5 +96,5 @@ def main():
     print("Memory cost:\n")
     fst_memory = 855260
     print("FST -> %sK" % fst_memory)
-    hash_memory = 10
-    print("Hash Table -> %s" % hash_memory)
+    hash_memory = 11936
+    print("Hash Table -> %sK" % hash_memory)
