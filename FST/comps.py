@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import time
-from fst import create_minimal_transducer
-from hash_table import create_hash_table
+from fst import create_minimal_transducer, search_fst
+from hash_table import create_hash_table, search_hash_table
 
 def main():
     filename = 'american-english'
@@ -39,7 +39,7 @@ def main():
         # exact match time
 
         start_time = time.time()
-        # FST executable
+        search_fst(minimal_transducer_states_dict, initial_state, word, True)
         fst_time = time.time() - start_time
         fst_time_list.append(fst_time)
         print("--- %s seconds ---\n" % fst_time)
@@ -47,7 +47,7 @@ def main():
         # autocomplete time
 
         start_time = time.time()
-        # FST executable
+        search_fst(minimal_transducer_states_dict, initial_state, word, False)
         autocomplete_time = time.time() - start_time
         autocomplete_time_list.append(autocomplete_time)
         print("--- %s seconds ---\n" % autocomplete_time)
@@ -56,7 +56,7 @@ def main():
         # only exact match
 
         start_time = time.time()
-        # Hash executable
+        search_hash_table(hash_dict, word)
         hash_time = time.time() - start_time
         hash_time_list.append(hash_time)
         print("--- %s seconds ---\n" % hash_time)
