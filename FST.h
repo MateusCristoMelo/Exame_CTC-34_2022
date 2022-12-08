@@ -40,7 +40,7 @@ STATE *new_state(FST *t, bool bounds);
 
 void clear_state(STATE *x);
 
-STATE *next_state(STATE *x, char letter);
+std::vector<STATE *> *next_states(STATE *x, char letter);
 
 STATE *previous_state(STATE *x, char letter);
 
@@ -71,6 +71,14 @@ void clear_list(std::vector<std::string> *list);
 FST *create_fst(void);
 
 void print_words_with_prefix(std::string *prefix, FST *fst);
+
+bool find_prefix_state(STATE *state, std::string& word, int prefix_length, int ind_prefix, int *curr_weight, STATE **nex);
+
+bool find_suffix_state(STATE *state, std::string& word, int suffix_length, int ind_suffix, STATE **prev);
+
+void print_words_with_prefix(std::string *prefix, FST *fst);
+
+bool find_prefix_states(STATE *state, std::string& word, int prefix_length, int ind_prefix, std::vector<STATE *> *prefix_states);
 
 void search_words(FST *fst, STATE *state, std::string prefix, std::string *search);
 
