@@ -4,14 +4,15 @@ from subprocess import run
 def choice_function():
     if(radio_button_var.get() == "Levenshtein"):
         autocomplete_text["text"] = run(["python", "levenshtein.py"], text = True, input = input_string.get(), capture_output= True).stdout
-        #import levenshtein
         #levenshtein.string = input_string.get()
         #autocomplete_text["text"] = levenshtein.words
 
-    #elif(radio_button_var.get() == "FST"):
+    elif(radio_button_var.get() == "FST"):
+        autocomplete_text["text"] = run(["python", "fst.py"],  text = True, cwd = "FST")
 
-    #elif(radio_button_var.get() == "Hash"):
-        
+    elif(radio_button_var.get() == "Hash"):
+        #autocomplete_text["text"] = run(["python", "/FST/hash_table.py"], text = True, input = input_string.get(), capture_output= True).stdout
+        autocomplete_text["text"] = run(["python", "hash_table.py"], text = True, input = input_string.get(), capture_output= True, cwd = "FST").stdout
     else:
         autocomplete_text["text"] = "Selecione uma opção"
 
