@@ -111,6 +111,47 @@ def autocomplete(minimal_transducer_states_dict, initial_state):
                 print("No matching words")
                 print(">>> " + word, end='', flush=True)
 
+def autocomplete_test(minimal_transducer_states_dict, initial_state, word_input):
+
+    state = initial_state
+    word = ""
+    for char in word_input:
+        if char in state.transition:
+            word += char
+            print(char, flush=True)
+            state = state.transition[char]
+            words = []
+            complete_prefix(5, minimal_transducer_states_dict, state, word, words)
+            for w in words:
+                print('    ' + w)
+            print(">>> " + word, end='', flush=True)
+        elif char in string.printable:
+            print(char, flush=True)
+            print("No matching words")
+            print(">>> " + word, end='', flush=True)
+
+def search_fst(minimal_transducer_states_dict, initial_state, word, is_exact):
+
+    if is_exact:
+        current_state = initial_state
+        for c in word:
+            flag_pass = False
+            for char, next_state in current_state.transition.items():
+                if c == char:
+                    flag_pass = True
+                    current_state = next_state
+            if not flag_pass:
+                break
+
+        if current_state.final is True:
+            print("The word is in the dictionary.")
+        else:
+            print("The word is not in the dictionary.")
+
+    else:
+        autocomplete_test(minimal_transducer_states_dict, initial_state, word)
+
+
 def main():
     filename = 'american-english'
     with open(filename, 'r') as f:
