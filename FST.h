@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <stack>
 
 typedef struct state STATE;
 typedef struct transition TRANST;
@@ -69,6 +70,8 @@ void clear_list(std::vector<std::string> *list);
 
 FST *create_fst(void);
 
-void print_words_with_prefix(const std::string& prefix, FST *fst);
+void print_words_with_prefix(std::string *prefix, FST *fst);
+
+void search_words(FST *fst, STATE *state, std::string prefix, std::string *search);
 
 #endif

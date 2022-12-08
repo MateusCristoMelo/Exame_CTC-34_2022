@@ -439,15 +439,33 @@ FST *create_fst(void) {
 
 };
 
-void print_words_with_prefix(const std::string& prefix, FST *fst) {
-    // Start at the beginning of the FST
-    STATE *current_state = fst->begin;
+void print_words_with_prefix(std::string *prefix, FST *fst) {
+    // Start at the beginning state of the FST
+    STATE *state = fst->begin;
 
-    for (char c : prefix) {
-        current_state = next_state(current_state, c);
-        if (current_state == nullptr) {
-            std::cout << "No words found with prefix \"" << prefix << "\"." << std::endl;
+    // Traverse the FST, following the transitions corresponding to each letter
+    // in the prefix
+    for (char c : *prefix) {
+        state = next_state(state, c);
+        if (state == nullptr) {
+            // If there is no state for the next letter, then there are no
+            // words in the FST that begin with the given prefix
+            std::cout << "No words found with prefix " << *prefix << std::endl;
             return;
         }
+    }
+
+    search_words(fst, state, "", prefix);
+
+}
+
+void search_words(FST *fst, STATE *state, std::string prefix, std::string *search) {
+    if (is_final(fst, state)) {
+        std::cout << *search << prefix << std::endl;
+    }
+
+    for (int i = 0; i < state->transitions; ++i) {
+        TRANST *transition = state->transitions_list[i];
+        search_words(fst, transition->next, prefix + transition->letter, search);
     }
 }

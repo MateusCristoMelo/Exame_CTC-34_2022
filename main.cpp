@@ -13,7 +13,7 @@ int main() {
     std::cin >> prefix;
 
     // Print the words that begin with the given prefix
-    print_words_with_prefix(prefix, fst);
+    print_words_with_prefix(&prefix, fst);
 
     return 0;
 }
