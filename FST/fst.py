@@ -118,17 +118,13 @@ def autocomplete_test(minimal_transducer_states_dict, initial_state, word_input)
     for char in word_input:
         if char in state.transition:
             word += char
-            print(char, flush=True)
             state = state.transition[char]
             words = []
-            complete_prefix(5, minimal_transducer_states_dict, state, word, words)
-            for w in words:
-                print('    ' + w)
-            print(">>> " + word, end='', flush=True)
+            if state.final and char == word_input[-1:]:
+                print("The word %s is in the dictionary." % word)
         elif char in string.printable:
             print(char, flush=True)
             print("No matching words")
-            print(">>> " + word, end='', flush=True)
 
 def search_fst(minimal_transducer_states_dict, initial_state, word, is_exact):
 
@@ -144,9 +140,9 @@ def search_fst(minimal_transducer_states_dict, initial_state, word, is_exact):
                 break
 
         if current_state.final is True:
-            print("The word is in the dictionary.")
+            print("The word %s is in the dictionary." % word)
         else:
-            print("The word is not in the dictionary.")
+            print("The word %s is not in the dictionary." % word)
 
     else:
         autocomplete_test(minimal_transducer_states_dict, initial_state, word)

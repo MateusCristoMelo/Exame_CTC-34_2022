@@ -1,9 +1,12 @@
 import matplotlib.pyplot as plt
 import time
+import math
 from fst import create_minimal_transducer, search_fst
 from hash_table import create_hash_table, search_hash_table
 
 def main():
+    start_file_time = time.time()
+
     filename = 'american-english'
     with open(filename, 'r') as f:
         input_list = f.read().splitlines()
@@ -38,10 +41,12 @@ def main():
 
     # compare time to execute exact searches, in fst measure the autocomplete time too
     for word in test_list:
-        word_len = len(word) / 2
+        word_len = math.floor(len(word) / 2)
 
         if word_len > 5:
             word_len = 4
+        elif word_len < 1:
+            word_len = 0
         else:
             word_len -= 1
 
@@ -53,16 +58,16 @@ def main():
         start_time = time.time()
         search_fst(minimal_transducer_states_dict, initial_state, word, True)
         fst_time = time.time() - start_time
-        fst_time_list_avg[word_len].append(int(fst_time))
-        print("--- %s seconds ---\n" % fst_time)
+        fst_time_list_avg[word_len].append(float(fst_time))
+        print("FST exact time of %s: %s seconds" % (word, fst_time))
 
         # autocomplete time
 
         start_time = time.time()
         search_fst(minimal_transducer_states_dict, initial_state, word, False)
         autocomplete_time = time.time() - start_time
-        autocomplete_time_list_avg[word_len].append(int(autocomplete_time))
-        print("--- %s seconds ---\n" % autocomplete_time)
+        autocomplete_time_list_avg[word_len].append(float(autocomplete_time))
+        print("FST autocomplete time of %s: %s seconds" % (word, autocomplete_time))
 
         # Hash time **************************************************************************
         # only exact match
@@ -70,67 +75,81 @@ def main():
         start_time = time.time()
         search_hash_table(hash_dict, word)
         hash_time = time.time() - start_time
-        hash_time_list_avg[word_len].append(int(hash_time))
-        print("--- %s seconds ---\n" % hash_time)
+        hash_time_list_avg[word_len].append(float(hash_time))
+        print("Hash exact time of %s: %s seconds" % (word, hash_time))
 
         word_index += 1
 
+        print("Word %s processed\n" % word_index)
+
     size_list = [0 for _ in range(5)]
 
-    for length in range(len(autocomplete_time_list)):
+    for index in range(len(size_list)):
+        size_list[index] = 2*index
+
+    for length in range(5):
+        size = len(autocomplete_time_list_avg[(length - 1)])
         sum = 0
-        size = len(autocomplete_time_list_avg[length])
         for i in range(size):
-            sum += autocomplete_time_list_avg[length][(i - 1)]
-        autocomplete_time_list[length - 1] = sum / size
-    
-    for length in range(len(fst_time_list)):
+            sum += autocomplete_time_list_avg[(length - 1)][(i - 1)]
+        autocomplete_time_list[(length - 1)] = sum / size
+        
+        size = len(fst_time_list_avg[(length - 1)])
         sum = 0
-        size = len(fst_time_list_avg[length])
         for i in range(size):
-            sum += fst_time_list_avg[length][(i - 1)]
-        fst_time_list[length - 1] = sum / size
-    
-    for length in range(len(hash_time_list)):
+            sum += fst_time_list_avg[(length - 1)][(i - 1)]
+        fst_time_list[(length - 1)] = sum / size
+        
+        size = len(hash_time_list_avg[(length - 1)])
         sum = 0
-        size = len(hash_time_list_avg[length])
         for i in range(size):
-            sum += hash_time_list_avg[length][(i - 1)]
-        hash_time_list[length - 1] = sum / size
+            sum += hash_time_list_avg[(length - 1)][(i - 1)]
+        hash_time_list[(length - 1)] = sum / size
 
 
     # plot comparable charts
-    plt.plot(size_list, autocomplete_time_list, fst_time_list)
-    plt.title('FST: with vs. without autocomplete')
+    plt.figure()
+    plt.plot(size_list, fst_time_list, label="Exact time")
+    plt.plot(size_list, autocomplete_time_list, label="Autocomplete")
+    plt.title('FST: with vs. wit5hout autocomplete')
     plt.xlabel('Word size (n)')
     plt.ylabel('Time (s)')
-    plt.show()
+    plt.legend(loc="upper left")
     plt.savefig('autocomplete_tests.png')
 
     print("Chart with time comparison between autocomplete and exact search (using only FST) ploted.\n")
 
-    plt.plot(size_list, fst_time_list, hash_time_list)
+    plt.figure()
+    plt.plot(size_list, fst_time_list, label="FST")
+    plt.plot(size_list, hash_time_list, label="Hash")
     plt.title('Exact search: FST vs. Hash')
     plt.xlabel('Word size (n)')
     plt.ylabel('Time (s)')
-    plt.show()
+    plt.legend(loc="upper left")
     plt.savefig('comps_tests.png')
 
     print("Chart with time comparison (of exact search) between FST and Hash Table ploted.\n\n")
 
     # show creation time
-    print("Creation times:\n")
+    print("Creation times:")
     print("FST -> %s seconds" % fst_creation_time)
-    print("Hash Table -> %s seconds" % hash_creation_time)
+    print("Hash Table -> %s seconds\n" % hash_creation_time)
 
     # show the number of edges
-    print("Number of edges:\n")
+    print("Number of edges:")
     print("FST -> %s edges" % fst_edges)
-    print("Hash Table -> %s edges" % hash_edges)
+    print("Hash Table -> %s lines\n" % hash_edges)
 
     # show the memory cost
-    print("Memory cost:\n")
+    print("Memory cost:")
     fst_memory = 855260
     print("FST -> %sK" % fst_memory)
     hash_memory = 11936
-    print("Hash Table -> %sK" % hash_memory)
+    print("Hash Table -> %sK\n" % hash_memory)
+
+    print("--- Exec time of all tests: %s seconds ---\n" % (time.time() - start_file_time))
+
+    plt.show()
+
+if __name__ == "__main__":
+    main()
