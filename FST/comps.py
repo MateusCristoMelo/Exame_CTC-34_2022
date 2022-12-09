@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import time
 import math
+import csv
 from fst import create_minimal_transducer, search_fst
 from hash_table import create_hash_table, search_hash_table
 
@@ -106,6 +107,13 @@ def main():
             sum += hash_time_list_avg[length][i]
         hash_time_list[length] = sum / size
 
+    csv_rowlist = []
+    for index in range(len(size_list)):
+        csv_rowlist.append([size_list[index], hash_time_list[index], fst_time_list[index], autocomplete_time_list[index]])
+
+    with open('comps.csv', mode='w') as file:
+        csv_writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        csv_writer.writerow(csv_rowlist)
 
     # plot comparable charts
     plt.figure()

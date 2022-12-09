@@ -147,6 +147,42 @@ def search_fst(minimal_transducer_states_dict, initial_state, word, is_exact):
     else:
         autocomplete_test(minimal_transducer_states_dict, initial_state, word)
 
+def save_fst(minimal_transducer_states_dict, initial_state):
+    # save the fst to json
+    with open('fst.json', 'w') as outfile:
+        json_dict = {}
+        json_dict['initial_state'] = initial_state.index
+        json_dict['states'] = {}
+        for state_id, state in minimal_transducer_states_dict.items():
+            json_dict['states'][state.index] = {}
+            json_dict['states'][state.index]['final'] = state.final
+            json_dict['states'][state.index]['transitions'] = {}
+            for t in state.transition:
+                json_dict['states'][state.index]['transitions'][t] = state.transition[t].index
+        json.dump(json_dict, outfile)
+
+def load_fst():
+    # load the fst from json
+    with open('fst.json', 'r') as infile:
+        json_dict = json.load(infile)
+        minimal_transducer_states_dict = {}
+        for state_id, state in json_dict['states'].items():
+            minimal_transducer_states_dict[int(state_id)] = State(int(state_id))
+            minimal_transducer_states_dict[int(state_id)].final = state['final']
+            minimal_transducer_states_dict[int(state_id)].transition = {}
+            for t in state['transitions']:
+                minimal_transducer_states_dict[int(state_id)].transition[t] = State(int(state['transitions'][t]))
+        initial_state_index = json_dict['initial_state']
+        initial_state = minimal_transducer_states_dict[initial_state_index]
+        return minimal_transducer_states_dict, initial_state
+
+def measure_memory_usage(minimal_transducer_states_dict):
+    transitions_count = 0
+    for state in minimal_transducer_states_dict:
+        transitions_count += len(minimal_transducer_states_dict[state].transition)
+    print("Number of states: %s" % len(minimal_transducer_states_dict))
+    print("Number of transitions: %s" % transitions_count)
+    print("Dict size: %s bytes" % sys.getsizeof(minimal_transducer_states_dict))
 
 def main():
     filename = 'american-english'
