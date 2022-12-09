@@ -88,23 +88,23 @@ def main():
         size_list[index] = 2*index
 
     for length in range(5):
-        size = len(autocomplete_time_list_avg[(length - 1)])
+        size = len(autocomplete_time_list_avg[length])
         sum = 0
         for i in range(size):
-            sum += autocomplete_time_list_avg[(length - 1)][(i - 1)]
-        autocomplete_time_list[(length - 1)] = sum / size
+            sum += autocomplete_time_list_avg[length][i]
+        autocomplete_time_list[length] = sum / size
         
-        size = len(fst_time_list_avg[(length - 1)])
+        size = len(fst_time_list_avg[length])
         sum = 0
         for i in range(size):
-            sum += fst_time_list_avg[(length - 1)][(i - 1)]
-        fst_time_list[(length - 1)] = sum / size
+            sum += fst_time_list_avg[length][i]
+        fst_time_list[length] = sum / size
         
-        size = len(hash_time_list_avg[(length - 1)])
+        size = len(hash_time_list_avg[length])
         sum = 0
         for i in range(size):
-            sum += hash_time_list_avg[(length - 1)][(i - 1)]
-        hash_time_list[(length - 1)] = sum / size
+            sum += hash_time_list_avg[length][i]
+        hash_time_list[length] = sum / size
 
 
     # plot comparable charts
@@ -136,8 +136,8 @@ def main():
     print("Hash Table -> %s seconds\n" % hash_creation_time)
 
     # show the number of edges
-    print("Number of edges:")
-    print("FST -> %s edges" % fst_edges)
+    print("Number of states:")
+    print("FST -> %s states" % fst_edges)
     print("Hash Table -> %s lines\n" % hash_edges)
 
     # show the memory cost
